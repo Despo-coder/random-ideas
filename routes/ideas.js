@@ -1,7 +1,4 @@
-const express = require('express');
-
-const app = express();
-const PORT = 5000;
+const router = require('express').Router();
 
 const ideas = [
   {
@@ -26,12 +23,23 @@ const ideas = [
     date: '2022-01-02',
   },
 ];
-
-app.get('/', (req, res) => {
-  res.send('Hello From the Server');
+//Get All Ideas
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    ideas,
+  });
+});
+//Get Idea by ID
+router.get('/:id', (req, res) => {
+  const idea = ideas.find((idea) => idea.id === +req.params.id);
+  if (!idea) {
+    return res.status(404).json({ msg: ' Resource Not Found' });
+  }
+  res.json({
+    success: true,
+    data: idea,
+  });
 });
 
-const ideasRouter = require('./routes/ideas');
-app.use('/api/ideas', ideasRouter);
-
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+module.exports = router;
