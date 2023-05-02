@@ -1,10 +1,12 @@
 const express = require('express');
-const PORT = 5000;
+const dotenv = require('dotenv').config();
+const PORT = process.env.PORT || 5500;
+const connectDB = require('./config/db');
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+connectDB();
 app.get('/', (req, res) => {
   res.send('Hello From the Server');
 });

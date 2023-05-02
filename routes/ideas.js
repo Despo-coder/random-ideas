@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const Idea = require('../models/Idea');
 
 const ideas = [
   {
@@ -24,58 +25,83 @@ const ideas = [
   },
 ];
 //Get All Ideas
-router.get('/', (req, res) => {
-  res.json({
-    success: true,
-    ideas,
-  });
-  console.log(ideas);
+router.get('/', async (req, res) => {
+  try {
+    const ideas = await Idea.find();
+    res.json({
+      success: true,
+      data: ideas,
+    });
+    console.log(ideas);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: error.message });
+  }
 });
 //Get Idea by ID
-router.get('/:id', (req, res) => {
-  const idea = ideas.find((idea) => idea.id === +req.params.id);
-  if (!idea) {
-    return res.status(404).json({ msg: ' Resource Not Found' });
+router.get('/:id', async (req, res) => {
+  try {
+    const ideas = await Idea.findById(req.params.id);
+
+    res.json({
+      success: true,
+      data: ideas,
+    });
+  } catch (error) {
+    if (!ideas) {
+      return res.status(404).json({ msg: ' Resource Not Found' });
+    }
+    res.status(500).json({ success: false, msg: error.message });
   }
-  res.json({
-    success: true,
-    data: idea,
-  });
 });
 
 //Add and Idea
 
-router.post('/', (req, res) => {
-  const idea = {
-    id: ideas.length + 1,
+router.post('/', async (req, res) => {
+  const idea = new Idea({
     text: req.body.text,
     tag: req.body.tag,
     username: req.body.username,
-    date: new Date().toISOString().slice(0, 10),
-  };
-  ideas.push(idea);
-  res.json({ success: true, data: idea });
+  });
+
+  try {
+    const savedIdea = await idea.save();
+    res.json({ success: true, data: savedIdea });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, msg: error.message });
+  }
 });
 
 //Update Idea
-router.put('/:id', (req, res) => {
-  const idea = ideas.find((idea) => idea.id === +req.params.id);
-  if (!idea) {
-    return res.status(404).json({ msg: ' Resource Not Found' });
+router.put('/:id', async (req, res) => {
+  try {
+    const Updatedidea = await Idea.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          text: req.body.text || text,
+          tag: req.body.tag || tag,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.json({ success: true, data: Updatedidea });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
   }
-  idea.text = req.body.text || idea.text;
-  idea.tag = req.body.tag || idea.tag;
-  res.json({ success: true, data: idea });
 });
 
 //Delete Idea
-router.delete('/:id', (req, res) => {
-  const idea = ideas.find((idea) => idea.id === +req.params.id);
-  if (!idea) {
-    return res.status(404).json({ msg: ' Resource Not Found' });
+router.delete('/:id', async (req, res) => {
+  try {
+    await Idea.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true, data: {} });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
   }
-  const index = ideas.indexOf(idea);
-  ideas.splice(index, 1);
-  res.json({ success: true, data: {} });
 });
 module.exports = router;
