@@ -1,7 +1,6 @@
 class Modal {
   constructor() {
     this._modal = document.querySelector('.modal');
-    this._modal = document.querySelector('.modalEdit');
     this._modalBtn = document.getElementById('modal-btn');
     this.addEventListeners();
     document.addEventListener('closemodal', () => this.close());
