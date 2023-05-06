@@ -3,12 +3,13 @@ class Modal {
     this._modal = document.querySelector('.modal');
     this._modalBtn = document.getElementById('modal-btn');
     this.addEventListeners();
-    document.addEventListener('closemodal', () => this.close());
+   
   }
 
   addEventListeners() {
     this._modalBtn.addEventListener('click', this.open.bind(this));
     window.addEventListener('click', this.outsideClick.bind(this));
+    document.addEventListener('closemodal', () => this.close());
   }
 
   open = () => {
